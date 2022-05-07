@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+def javaVersion = JavaVersion.VERSION_11;
+sourceCompatibility = javaVersion;
+targetCompatibility = javaVersion; // defaults to sourceCompatibility
+
+group 'com.pt'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+    options.release = 11
+}
+
+dependencies {
+    implementation 'org.keycloak:keycloak-server-spi:18.0.0'
+    implementation 'org.keycloak:keycloak-server-spi-private:18.0.0'
+    implementation 'org.keycloak:keycloak-services:18.0.0'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}

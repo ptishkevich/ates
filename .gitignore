@@ -1,0 +1,7 @@
+/.idea/
+/auth-event-listener/build/
+/auth-event-listener/.gradle/
+/auth-event-listener/gradle/wrapper/gradle-wrapper.jar
+/auth-event-listener/gradle/wrapper/gradle-wrapper.properties
+/auth-event-listener/gradlew
+/auth-event-listener/gradlew.bat
