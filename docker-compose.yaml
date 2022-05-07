@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+#    image: jboss/keycloak:legacy
+    container_name: keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak_db
+      DB_USER: postgres
+      DB_PASSWORD: example
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin_password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8484:8080"
+    depends_on:
+      - postgres
+    links:
+      - "postgres:postgres"
+    volumes:
+      - ./my-event-listener/build/libs/my-event-listener-0.0.1-SNAPSHOT.jar://opt/jboss/keycloak/standalone/deployments/my-event-listener-0.0.1-SNAPSHOT.jar
+#    command: start-dev
+#    start-dev
+#    --auto-build --hostname-strict=false
