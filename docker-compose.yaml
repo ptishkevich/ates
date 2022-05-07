@@ -13,7 +13,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:legacy
-#    image: jboss/keycloak:legacy
     container_name: keycloak
     environment:
       DB_VENDOR: POSTGRES
@@ -32,7 +31,4 @@ services:
     links:
       - "postgres:postgres"
     volumes:
-      - ./my-event-listener/build/libs/my-event-listener-0.0.1-SNAPSHOT.jar://opt/jboss/keycloak/standalone/deployments/my-event-listener-0.0.1-SNAPSHOT.jar
-#    command: start-dev
-#    start-dev
-#    --auto-build --hostname-strict=false
+      - ./auth-event-listener/build/libs/my-event-listener-0.0.1-SNAPSHOT.jar://opt/jboss/keycloak/standalone/deployments/my-event-listener-0.0.1-SNAPSHOT.jar
