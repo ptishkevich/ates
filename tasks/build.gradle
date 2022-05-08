@@ -22,6 +22,7 @@ dependencies {
     implementation 'org.keycloak.bom:keycloak-adapter-bom:18.0.0'
     implementation 'org.keycloak:keycloak-spring-security-adapter:18.0.0'
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'com.google.code.gson:gson:2.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
