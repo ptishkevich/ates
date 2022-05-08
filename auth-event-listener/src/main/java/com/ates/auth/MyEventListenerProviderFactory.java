@@ -1,4 +1,4 @@
-package com.todo;
+package com.ates.auth;
 
 import org.keycloak.Config;
 import org.keycloak.events.EventListenerProvider;

@@ -31,7 +31,7 @@ services:
     links:
       - "postgres:postgres"
     volumes:
-      - ./auth-event-listener/build/libs/my-event-listener-0.0.1-SNAPSHOT.jar://opt/jboss/keycloak/standalone/deployments/my-event-listener-0.0.1-SNAPSHOT.jar
+      - ./auth-event-listener/build/libs/auth-event-listener-0.0.1-SNAPSHOT-all.jar://opt/jboss/keycloak/standalone/deployments/auth-event-listener-0.0.1-SNAPSHOT-all.jar
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.4.1
