@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" >
+    <title>My tasks</title>
+</head>
+<body>
+<div class="container">
+    <h3>My tasks</h3>
+    <ul class="list-group" th:each="task: ${tasks}">
+        <li class="list-group-item" th:text="${task.description}" th:id="${task.id}">
+        </li>
+    </ul>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
+</body>
+</html>
