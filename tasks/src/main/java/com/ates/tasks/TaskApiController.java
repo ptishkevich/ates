@@ -1,12 +1,12 @@
 package com.ates.tasks;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -41,6 +41,24 @@ public class TaskApiController {
                 .peek(task -> task.setAssigneeId(getRandomEmployeeId(allEmployeeIds)))
                 .collect(Collectors.toList());
         taskRepository.saveAll(updatedTasks);
+    }
+
+    @PatchMapping("/tasks/{taskId}")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<String> patchTask(@PathVariable UUID taskId, @RequestBody Task task, Principal principal) {
+        UUID profileId = UUID.fromString(principal.getName());
+        Task dbTask = taskRepository.findById(taskId).orElse(null);
+        if (dbTask == null || !dbTask.getAssigneeId().equals(profileId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (task.getStatus() != null) {
+            dbTask.setStatus(task.getStatus());
+        }
+
+        taskRepository.save(dbTask);
+
+        return ResponseEntity.ok("");
     }
 
     private List<UUID> getAllEmployeeIds() {
