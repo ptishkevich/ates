@@ -16,6 +16,9 @@
         <input id="taskName" type="text" class="form-control" placeholder="Task name" aria-label="Task name" aria-describedby="basic-addon2">
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="createTask()">Add</button>
     </div>
+    <div th:if="${canShuffle}">
+        <button type="button" class="btn btn-primary btn-lg" onclick="shuffleTasks()">Shuffle</button>
+    </div>
 </div>
 
 <script src="/js/bootstrap.bundle.min.js"></script>
@@ -36,6 +39,12 @@
             async: false
         });
         console.log(body + " task created");
+    }
+    function shuffleTasks() {
+        $.ajax({
+            url: "/api/tasks/shuffle",
+            type: 'POST'
+        });
     }
 </script>
 </body>
