@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" >
+    <title>My tasks</title>
+</head>
+<body>
+<div class="container">
+    <h3>My tasks</h3>
+    <ul class="list-group" th:each="task: ${tasks}">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div th:text="${task.status + ' | ' + task.description}"></div>
+            <div th:if="${task.status.name() == 'OPEN'}">
+                <a href="#" onclick="completeTask(this)" th:id="${task.id}">Mark Complete</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script>
+    function completeTask(element) {
+        var data = {};
+        data["status"] = 'COMPLETED';
+        var body = JSON.stringify(data);
+        $.ajax({
+            url: "/api/tasks/" + element.id,
+            contentType: "application/json",
+            data: body,
+            dataType: "json",
+            type: 'PATCH',
+            success: function (response) {},
+            async: false
+        });
+    }
+</script>
+</body>
+</html>

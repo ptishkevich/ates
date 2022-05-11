@@ -28,8 +28,10 @@ services:
       - "8484:8080"
     depends_on:
       - postgres
+      - broker
     links:
       - "postgres:postgres"
+      - "broker:broker"
     volumes:
       - ./auth-event-listener/build/libs/auth-event-listener-0.0.1-SNAPSHOT-all.jar://opt/jboss/keycloak/standalone/deployments/auth-event-listener-0.0.1-SNAPSHOT-all.jar
 
