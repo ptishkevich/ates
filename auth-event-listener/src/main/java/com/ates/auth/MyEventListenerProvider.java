@@ -21,7 +21,7 @@ import java.util.Properties;
 
 public class MyEventListenerProvider implements EventListenerProvider {
     private static final Logger log = Logger.getLogger(MyEventListenerProvider.class);
-    private static final String PROFILE_TOPIC_NAME = "profile";
+    private static final String PROFILE_TOPIC_NAME = "profile-stream";
     private final KeycloakSession session;
     private final RealmProvider model;
     private final Producer<String, String> producer;
@@ -35,7 +35,7 @@ public class MyEventListenerProvider implements EventListenerProvider {
 
     private Properties getProducerProps() {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:29092");
         props.put("acks", "all");
         props.put("retries", 0);
         props.put("batch.size", 16384);

@@ -30,7 +30,7 @@ public class TasksApplication {
 		return new KeycloakSpringBootConfigResolver();
 	}
 
-	@KafkaListener(topics = "profiles", groupId = "foo") //id = "myId",
+	@KafkaListener(topics = "profile-stream", groupId = "foo") //id = "myId",
 	public void listen(@Payload String data, @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key) {
 		System.out.println("############## Received message key= " + key + " , value= " + data);
 		Profile profile = gson.fromJson(data, Profile.class);
