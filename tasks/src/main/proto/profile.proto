@@ -1,0 +1,19 @@
+syntax = "proto3";
+package profile;
+option java_package = "com.ates.messages";
+
+enum Role {
+    ROLE_ADMIN = 0;
+    ROLE_EMPLOYEE = 1;
+}
+
+message Created {
+   string publicId = 1;
+   string name = 2;
+   string email = 3;
+}
+
+message RoleUpdated {
+   string publicId = 1;
+   Role role = 2;
+}
