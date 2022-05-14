@@ -30,7 +30,7 @@ public class AppMvcController {
     public String assignTasks(Model model, Principal principal) {
 
         UUID profileId = UUID.fromString(principal.getName());
-        boolean canShuffle = "admin".equals(profileRepository.findById(profileId).get().getRole());
+        boolean canShuffle = "ROLE_ADMIN".equals(profileRepository.findById(profileId).get().getRole());
 
         List<Task> tasks = new ArrayList<>();
         taskRepository

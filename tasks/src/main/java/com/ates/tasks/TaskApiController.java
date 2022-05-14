@@ -64,7 +64,7 @@ public class TaskApiController {
     private List<UUID> getAllEmployeeIds() {
         return StreamSupport
                 .stream(profileRepository.findAll().spliterator(), false)
-                .filter(profile -> "employee".equals(profile.getRole()))
+                .filter(profile -> "ROLE_EMPLOYEE".equals(profile.getRole()))
                 .map(Profile::getId)
                 .collect(Collectors.toList());
     }
