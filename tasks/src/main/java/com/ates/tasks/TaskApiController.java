@@ -20,6 +20,8 @@ public class TaskApiController {
     TaskRepository taskRepository;
     @Autowired
     ProfileRepository profileRepository;
+    @Autowired
+    TaskEventSender taskEventSender;
 
     private final Random randomInt = new Random();
 
@@ -29,6 +31,7 @@ public class TaskApiController {
         task.setStatus(Task.TaskStatus.OPEN);
         task.setAssigneeId(getRandomEmployeeId(getAllEmployeeIds()));
         taskRepository.save(task);
+        taskEventSender.sendTaskAddedEvent(task);
     }
 
     @PostMapping("/tasks/shuffle")
