@@ -7,3 +7,4 @@ gradlew
 gradlew.bat
 /tasks/build/
 /billing/build/
+/analytics/build/
