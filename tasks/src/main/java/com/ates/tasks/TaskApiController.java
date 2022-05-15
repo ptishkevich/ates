@@ -45,6 +45,7 @@ public class TaskApiController {
                 .peek(task -> task.setAssigneeId(getRandomEmployeeId(allEmployeeIds)))
                 .collect(Collectors.toList());
         taskRepository.saveAll(updatedTasks);
+        updatedTasks.forEach(task -> taskEventSender.sendTaskAssignedEvent(task));
     }
 
     @PatchMapping("/tasks/{taskId}")
