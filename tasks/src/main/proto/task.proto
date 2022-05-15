@@ -6,3 +6,8 @@ message Added {
     string publicId = 1;
     string description = 2;
 }
+
+message Assigned {
+    string publicId = 1;
+    string assigneeId = 2;
+}

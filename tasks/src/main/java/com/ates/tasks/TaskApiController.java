@@ -32,6 +32,7 @@ public class TaskApiController {
         task.setAssigneeId(getRandomEmployeeId(getAllEmployeeIds()));
         taskRepository.save(task);
         taskEventSender.sendTaskAddedEvent(task);
+        taskEventSender.sendTaskAssignedEvent(task);
     }
 
     @PostMapping("/tasks/shuffle")

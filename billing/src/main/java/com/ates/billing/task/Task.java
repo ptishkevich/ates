@@ -15,6 +15,8 @@ public class Task {
     private UUID publicId;
     private int debitAmount;
     private int creditAmount;
+    private String description;
+    // maybe not needed?
     private int assigneeId;
 
     public int getId() {
@@ -55,5 +57,13 @@ public class Task {
 
     public void setAssigneeId(int assigneeId) {
         this.assigneeId = assigneeId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

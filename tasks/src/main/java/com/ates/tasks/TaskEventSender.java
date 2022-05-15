@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 public class TaskEventSender {
     @Autowired
     private KafkaTemplate<String, Task.Added> taskAddedTemplate;
+    @Autowired
+    private KafkaTemplate<String, Task.Assigned> taskAssignedTemplate;
+
+    private static final String TASK_LIFECYCLE_TOPIC_NAME = "task-lifecycle";
 
     @Bean
     public NewTopic topic() {
@@ -27,6 +31,17 @@ public class TaskEventSender {
                 .setPublicId(publicId)
                 .setDescription(task.getDescription())
                 .build();
-        taskAddedTemplate.send("task-lifecycle", publicId, taskAddedMsg);
+        taskAddedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskAddedMsg);
+    }
+
+    public void sendTaskAssignedEvent(com.ates.tasks.Task task) {
+        String publicId = task.getId().toString();
+        String assigneeId = task.getAssigneeId().toString();
+        Task.Assigned taskAssignedMsg = Task.Assigned
+                .newBuilder()
+                .setPublicId(publicId)
+                .setAssigneeId(assigneeId)
+                .build();
+        taskAssignedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskAssignedMsg);
     }
 }
