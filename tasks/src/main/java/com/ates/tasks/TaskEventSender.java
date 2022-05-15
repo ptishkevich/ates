@@ -14,6 +14,8 @@ public class TaskEventSender {
     private KafkaTemplate<String, Task.Added> taskAddedTemplate;
     @Autowired
     private KafkaTemplate<String, Task.Assigned> taskAssignedTemplate;
+    @Autowired
+    private KafkaTemplate<String, Task.Completed> taskCompletedTemplate;
 
     private static final String TASK_LIFECYCLE_TOPIC_NAME = "task-lifecycle";
 
@@ -43,5 +45,16 @@ public class TaskEventSender {
                 .setAssigneeId(assigneeId)
                 .build();
         taskAssignedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskAssignedMsg);
+    }
+
+    public void sendTaskCompletedEvent(com.ates.tasks.Task task) {
+        String publicId = task.getId().toString();
+        String assigneeId = task.getAssigneeId().toString();
+        Task.Completed taskCompletedMsg = Task.Completed
+                .newBuilder()
+                .setPublicId(publicId)
+                .setCompletedById(assigneeId)
+                .build();
+        taskCompletedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskCompletedMsg);
     }
 }

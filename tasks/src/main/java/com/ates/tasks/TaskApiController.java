@@ -57,11 +57,13 @@ public class TaskApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        if (task.getStatus() != null) {
+        if (task.getStatus() != null && dbTask.getStatus() != task.getStatus()) {
             dbTask.setStatus(task.getStatus());
+            Task updatedTask = taskRepository.save(dbTask);
+            if (Task.TaskStatus.COMPLETED == updatedTask.getStatus()) {
+                taskEventSender.sendTaskCompletedEvent(updatedTask);
+            }
         }
-
-        taskRepository.save(dbTask);
 
         return ResponseEntity.ok("");
     }

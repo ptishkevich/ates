@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class TaskMessagingService {
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     @Autowired
     TaskRepository taskRepository;
@@ -41,11 +41,16 @@ public class TaskMessagingService {
         DynamicMessage message = data.value();
         String messageType = message.getDescriptorForType().getFullName();
 
-        if ("task.Added".equals(messageType)) {
-            handleTaskAdded(message);
-        }
-        else if("task.Assigned".equals(messageType)) {
-            handleTaskAssigned(message);
+        switch (messageType) {
+            case "task.Added":
+                handleTaskAdded(message);
+                break;
+            case "task.Assigned":
+                handleTaskAssigned(message);
+                break;
+            case "task.Completed":
+                handleTaskCompleted(message);
+                break;
         }
     }
 
@@ -75,7 +80,26 @@ public class TaskMessagingService {
                 .parseFrom(message.toByteArray());
 
         UUID assigneePublicId = UUID.fromString(assignedMsg.getAssigneeId());
-        Profile profile = findProfile(assigneePublicId);
+        UUID taskPublicId = UUID.fromString(assignedMsg.getPublicId());
+
+        createAuditLogRecord(assigneePublicId, taskPublicId, AccountLogRecord.OperationType.DEBIT);
+    }
+
+    private void handleTaskCompleted(DynamicMessage message) throws InvalidProtocolBufferException {
+        Task.Completed taskCompletedMsg = Task.Completed
+                .newBuilder()
+                .build()
+                .getParserForType()
+                .parseFrom(message.toByteArray());
+
+        UUID completedByPublicId = UUID.fromString(taskCompletedMsg.getCompletedById());
+        UUID taskPublicId = UUID.fromString(taskCompletedMsg.getPublicId());
+
+        createAuditLogRecord(completedByPublicId, taskPublicId, AccountLogRecord.OperationType.CREDIT);
+    }
+
+    private void createAuditLogRecord(UUID profilePublicId, UUID taskPublicId, AccountLogRecord.OperationType operationType) {
+        Profile profile = findProfile(profilePublicId);
 
         // update or create account
         Account account = StreamSupport
@@ -89,13 +113,16 @@ public class TaskMessagingService {
                     return accountRepository.save(newAccount);
                 });
 
-        UUID taskPublicId = UUID.fromString(assignedMsg.getPublicId());
         com.ates.billing.task.Task task = findTask(taskPublicId);
+        int amount = AccountLogRecord.OperationType.DEBIT == operationType
+                ? task.getDebitAmount()
+                : task.getCreditAmount();
+
         account
                 .getAuditLog()
                 .add(new AccountLogRecord(
-                        task.getDebitAmount(),
-                        AccountLogRecord.OperationType.DEBIT,
+                        amount,
+                        operationType,
                         task.getDescription(),
                         System.currentTimeMillis()
                 ));

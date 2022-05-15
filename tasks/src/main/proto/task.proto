@@ -11,3 +11,8 @@ message Assigned {
     string publicId = 1;
     string assigneeId = 2;
 }
+
+message Completed {
+    string publicId = 1;
+    string completedById = 2;
+}
