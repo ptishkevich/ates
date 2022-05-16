@@ -1,0 +1,18 @@
+syntax = "proto3";
+package task;
+option java_package = "com.ates.messages";
+
+message Added {
+    string publicId = 1;
+    string description = 2;
+}
+
+message Assigned {
+    string publicId = 1;
+    string assigneeId = 2;
+}
+
+message Completed {
+    string publicId = 1;
+    string completedById = 2;
+}

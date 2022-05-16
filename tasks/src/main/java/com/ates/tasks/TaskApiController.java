@@ -20,6 +20,8 @@ public class TaskApiController {
     TaskRepository taskRepository;
     @Autowired
     ProfileRepository profileRepository;
+    @Autowired
+    TaskEventSender taskEventSender;
 
     private final Random randomInt = new Random();
 
@@ -29,6 +31,8 @@ public class TaskApiController {
         task.setStatus(Task.TaskStatus.OPEN);
         task.setAssigneeId(getRandomEmployeeId(getAllEmployeeIds()));
         taskRepository.save(task);
+        taskEventSender.sendTaskAddedEvent(task);
+        taskEventSender.sendTaskAssignedEvent(task);
     }
 
     @PostMapping("/tasks/shuffle")
@@ -41,6 +45,7 @@ public class TaskApiController {
                 .peek(task -> task.setAssigneeId(getRandomEmployeeId(allEmployeeIds)))
                 .collect(Collectors.toList());
         taskRepository.saveAll(updatedTasks);
+        updatedTasks.forEach(task -> taskEventSender.sendTaskAssignedEvent(task));
     }
 
     @PatchMapping("/tasks/{taskId}")
@@ -52,11 +57,13 @@ public class TaskApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        if (task.getStatus() != null) {
+        if (task.getStatus() != null && dbTask.getStatus() != task.getStatus()) {
             dbTask.setStatus(task.getStatus());
+            Task updatedTask = taskRepository.save(dbTask);
+            if (Task.TaskStatus.COMPLETED == updatedTask.getStatus()) {
+                taskEventSender.sendTaskCompletedEvent(updatedTask);
+            }
         }
-
-        taskRepository.save(dbTask);
 
         return ResponseEntity.ok("");
     }
