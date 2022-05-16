@@ -1,5 +1,6 @@
 package com.ates.tasks;
 
+import com.ates.messages.EventHeaders;
 import com.ates.messages.Task;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class TaskEventSender {
@@ -18,6 +21,13 @@ public class TaskEventSender {
     private KafkaTemplate<String, Task.Completed> taskCompletedTemplate;
 
     private static final String TASK_LIFECYCLE_TOPIC_NAME = "task-lifecycle";
+    private static final EventHeaders DEFAULT_EVENT_HEADERS = EventHeaders
+            .newBuilder()
+            .setId(UUID.randomUUID().toString())
+            .setVersion(1)
+            .setProducer(TaskEventSender.class.getSimpleName())
+            .setTime(System.currentTimeMillis())
+            .build();
 
     @Bean
     public NewTopic topic() {
@@ -30,6 +40,7 @@ public class TaskEventSender {
         String publicId = task.getId().toString();
         Task.Added taskAddedMsg = Task.Added
                 .newBuilder()
+                .setHeaders(DEFAULT_EVENT_HEADERS)
                 .setPublicId(publicId)
                 .setDescription(task.getDescription())
                 .build();
@@ -41,6 +52,7 @@ public class TaskEventSender {
         String assigneeId = task.getAssigneeId().toString();
         Task.Assigned taskAssignedMsg = Task.Assigned
                 .newBuilder()
+                .setHeaders(DEFAULT_EVENT_HEADERS)
                 .setPublicId(publicId)
                 .setAssigneeId(assigneeId)
                 .build();
@@ -52,6 +64,7 @@ public class TaskEventSender {
         String assigneeId = task.getAssigneeId().toString();
         Task.Completed taskCompletedMsg = Task.Completed
                 .newBuilder()
+                .setHeaders(DEFAULT_EVENT_HEADERS)
                 .setPublicId(publicId)
                 .setCompletedById(assigneeId)
                 .build();

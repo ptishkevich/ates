@@ -1,18 +1,22 @@
 syntax = "proto3";
 package task;
+import "event.proto";
 option java_package = "com.ates.messages";
 
 message Added {
     string publicId = 1;
     string description = 2;
+    EventHeaders headers = 3;
 }
 
 message Assigned {
     string publicId = 1;
     string assigneeId = 2;
+    EventHeaders headers = 3;
 }
 
 message Completed {
     string publicId = 1;
     string completedById = 2;
+    EventHeaders headers = 3;
 }
