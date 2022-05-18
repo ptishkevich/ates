@@ -45,6 +45,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/close-billing-cycle").permitAll()
                 .anyRequest().fullyAuthenticated();
     }
 }
