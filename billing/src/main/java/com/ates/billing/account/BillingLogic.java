@@ -1,9 +1,16 @@
 package com.ates.billing.account;
 
 import com.ates.billing.FakeEmailService;
+import com.ates.billing.profile.Profile;
 import com.ates.billing.profile.ProfileRepository;
+import com.ates.billing.task.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -17,6 +24,28 @@ public class BillingLogic {
     ProfileRepository profileRepository;
     @Autowired
     BillingCycleRepository billingCycleRepository;
+    @Autowired
+    TaskRepository taskRepository;
+
+    private final Random random = new Random();
+
+    public void applyFeeForTaskAssignment(UUID assigneePublicId, UUID taskPublicId) {
+        createAuditLogRecord(assigneePublicId, taskPublicId, AccountLogRecord.OperationType.DEBIT);
+    }
+
+    public void applyPaymentForTaskCompletion(UUID completedByPublicId, UUID taskPublicId) {
+        createAuditLogRecord(completedByPublicId, taskPublicId, AccountLogRecord.OperationType.CREDIT);
+    }
+
+    public void calculateTaskPrices(UUID taskPublicId, String description) {
+        com.ates.billing.task.Task task = new com.ates.billing.task.Task();
+        task.setPublicId(taskPublicId);
+        task.setDescription(description);
+        task.setCreditAmount(random.nextInt(21) + 20);
+        task.setDebitAmount(random.nextInt(11) + 10);
+
+        taskRepository.save(task);
+    }
 
     public void closeBillingCycle() {
         // determine beginning and the end of billing cycle
@@ -80,4 +109,62 @@ public class BillingLogic {
                     );
         }
     }
+
+    private void createAuditLogRecord(UUID profilePublicId, UUID taskPublicId, AccountLogRecord.OperationType operationType) {
+        Profile profile = findProfile(profilePublicId);
+
+        // update or create account
+        Account account = StreamSupport
+                .stream(accountRepository.findAll().spliterator(), false)
+                .filter(acc -> profile.getId().equals(acc.getProfileId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    Account newAccount = new Account();
+                    newAccount.setProfileId(profile.getId());
+                    newAccount.setAuditLog(new ArrayList<>());
+                    return accountRepository.save(newAccount);
+                });
+
+        com.ates.billing.task.Task task = findTask(taskPublicId);
+        int amount = AccountLogRecord.OperationType.DEBIT == operationType
+                ? task.getDebitAmount()
+                : task.getCreditAmount();
+
+        account
+                .getAuditLog()
+                .add(new AccountLogRecord(
+                        amount,
+                        operationType,
+                        task.getDescription(),
+                        System.currentTimeMillis()
+                ));
+
+        accountRepository.save(account);
+    }
+
+    private Profile findProfile(UUID profilePublicId) {
+        Optional<Profile> profileOptional = StreamSupport
+                .stream(profileRepository.findAll().spliterator(), false)
+                .filter(profile -> profilePublicId.equals(profile.getPublicId()))
+                .findFirst();
+
+        if (profileOptional.isEmpty()) {
+            throw new RuntimeException("Profile " + profilePublicId + " not found during assignment fee calculation");
+        }
+
+        return profileOptional.get();
+    }
+
+    private com.ates.billing.task.Task findTask(UUID taskPublicId) {
+        Optional<com.ates.billing.task.Task> taskOptional = StreamSupport
+                .stream(taskRepository.findAll().spliterator(), false)
+                .filter(task -> taskPublicId.equals(task.getPublicId()))
+                .findFirst();
+
+        if (taskOptional.isEmpty()) {
+            throw new RuntimeException("Task " + taskPublicId + " not found during assignment fee calculation");
+        }
+        return taskOptional.get();
+    }
+
 }
