@@ -8,4 +8,5 @@ message EventHeaders {
     string id = 2;
     int64 time = 3;
     string producer = 4;
+    string messageType = 5;
 }

@@ -21,13 +21,6 @@ public class TaskEventSender {
     private KafkaTemplate<String, Task.Completed> taskCompletedTemplate;
 
     private static final String TASK_LIFECYCLE_TOPIC_NAME = "task-lifecycle";
-    private static final EventHeaders DEFAULT_EVENT_HEADERS = EventHeaders
-            .newBuilder()
-            .setId(UUID.randomUUID().toString())
-            .setVersion(1)
-            .setProducer(TaskEventSender.class.getSimpleName())
-            .setTime(System.currentTimeMillis())
-            .build();
 
     @Bean
     public NewTopic topic() {
@@ -40,7 +33,7 @@ public class TaskEventSender {
         String publicId = task.getId().toString();
         Task.Added taskAddedMsg = Task.Added
                 .newBuilder()
-                .setHeaders(DEFAULT_EVENT_HEADERS)
+                .setHeaders(getEventHeaders(1, Task.Added.getDescriptor().getFullName()))
                 .setPublicId(publicId)
                 .setDescription(task.getDescription())
                 .build();
@@ -52,7 +45,7 @@ public class TaskEventSender {
         String assigneeId = task.getAssigneeId().toString();
         Task.Assigned taskAssignedMsg = Task.Assigned
                 .newBuilder()
-                .setHeaders(DEFAULT_EVENT_HEADERS)
+                .setHeaders(getEventHeaders(1, Task.Assigned.getDescriptor().getFullName()))
                 .setPublicId(publicId)
                 .setAssigneeId(assigneeId)
                 .build();
@@ -64,10 +57,21 @@ public class TaskEventSender {
         String assigneeId = task.getAssigneeId().toString();
         Task.Completed taskCompletedMsg = Task.Completed
                 .newBuilder()
-                .setHeaders(DEFAULT_EVENT_HEADERS)
+                .setHeaders(getEventHeaders(1, Task.Completed.getDescriptor().getFullName()))
                 .setPublicId(publicId)
                 .setCompletedById(assigneeId)
                 .build();
         taskCompletedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskCompletedMsg);
+    }
+
+    private EventHeaders getEventHeaders(int version, String eventType) {
+        return EventHeaders
+                .newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setVersion(version)
+                .setProducer(this.getClass().getSimpleName())
+                .setTime(System.currentTimeMillis())
+                .setMessageType(eventType)
+                .build();
     }
 }
