@@ -16,7 +16,7 @@ public class AccountEventSender {
 
     private static final String ACCOUNT_TRANSACTIONS_TOPIC_NAME = "account-transactions";
 
-    public void sendTaskPaymentAppliedEvent(String accountOwnerId, String taskId, int amount) {
+    public void sendTaskPaymentAppliedEvent(String accountOwnerId, String taskId, int amount, long performedAt) {
         EventHeaders eventHeaders = EventUtils.getEventHeaders(
                 1,
                 Account.TaskCompletionPaymentApplied.getDescriptor().getFullName(),
@@ -29,12 +29,13 @@ public class AccountEventSender {
                 .setAccountOwnerPublicId(accountOwnerId)
                 .setTaskPublicId(taskId)
                 .setAmount(amount)
+                .setPerformedAt(performedAt)
                 .build();
 
         taskPaymentTemplate.send(ACCOUNT_TRANSACTIONS_TOPIC_NAME, accountOwnerId, taskPaymentMsg);
     }
 
-    public void sendTaskFeeAppliedEvent(String accountOwnerId, String taskId, int amount) {
+    public void sendTaskFeeAppliedEvent(String accountOwnerId, String taskId, int amount, long performedAt) {
         EventHeaders eventHeaders = EventUtils.getEventHeaders(
                 1,
                 Account.TaskAssignmentFeeApplied.getDescriptor().getFullName(),
@@ -47,6 +48,7 @@ public class AccountEventSender {
                 .setAccountOwnerPublicId(accountOwnerId)
                 .setTaskPublicId(taskId)
                 .setAmount(amount)
+                .setPerformedAt(performedAt)
                 .build();
 
         taskFeeTemplate.send(ACCOUNT_TRANSACTIONS_TOPIC_NAME, accountOwnerId, taskFeeMsg);

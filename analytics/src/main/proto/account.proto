@@ -8,6 +8,7 @@ message TaskCompletionPaymentApplied {
     string taskPublicId = 2;
     string accountOwnerPublicId = 3;
     int32 amount = 4;
+    int64 performedAt = 5;
 }
 
 message TaskAssignmentFeeApplied {
@@ -15,4 +16,5 @@ message TaskAssignmentFeeApplied {
     string taskPublicId = 2;
     string accountOwnerPublicId = 3;
     int32 amount = 4;
+    int64 performedAt = 5;
 }

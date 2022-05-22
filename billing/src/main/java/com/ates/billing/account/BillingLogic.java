@@ -34,15 +34,23 @@ public class BillingLogic {
     private final Random random = new Random();
 
     public void applyFeeForTaskAssignment(UUID assigneePublicId, UUID taskPublicId) {
-        createAuditLogRecord(assigneePublicId, taskPublicId, AccountLogRecord.OperationType.DEBIT);
-        int feeAmount = findTask(taskPublicId).getDebitAmount();
-        accountEventSender.sendTaskFeeAppliedEvent(assigneePublicId.toString(), taskPublicId.toString(), feeAmount);
+        AccountLogRecord auditLogRecord = createAuditLogRecord(assigneePublicId, taskPublicId, AccountLogRecord.OperationType.DEBIT);
+        accountEventSender.sendTaskFeeAppliedEvent(
+                assigneePublicId.toString(),
+                taskPublicId.toString(),
+                auditLogRecord.getAmount(),
+                auditLogRecord.getTimestamp()
+        );
     }
 
     public void applyPaymentForTaskCompletion(UUID completedByPublicId, UUID taskPublicId) {
-        createAuditLogRecord(completedByPublicId, taskPublicId, AccountLogRecord.OperationType.CREDIT);
-        int paymentAmount = findTask(taskPublicId).getCreditAmount();
-        accountEventSender.sendTaskPaymentAppliedEvent(completedByPublicId.toString(), taskPublicId.toString(), paymentAmount);
+        AccountLogRecord auditLogRecord = createAuditLogRecord(completedByPublicId, taskPublicId, AccountLogRecord.OperationType.CREDIT);
+        accountEventSender.sendTaskPaymentAppliedEvent(
+                completedByPublicId.toString(),
+                taskPublicId.toString(),
+                auditLogRecord.getAmount(),
+                auditLogRecord.getTimestamp()
+        );
     }
 
     public void calculateTaskPrices(UUID taskPublicId, String description) {
@@ -120,7 +128,7 @@ public class BillingLogic {
         }
     }
 
-    private void createAuditLogRecord(UUID profilePublicId, UUID taskPublicId, AccountLogRecord.OperationType operationType) {
+    private AccountLogRecord createAuditLogRecord(UUID profilePublicId, UUID taskPublicId, AccountLogRecord.OperationType operationType) {
         Profile profile = findProfile(profilePublicId);
 
         // update or create account
@@ -140,16 +148,18 @@ public class BillingLogic {
                 ? task.getDebitAmount()
                 : task.getCreditAmount();
 
+
+        AccountLogRecord accountLogRecord = new AccountLogRecord(
+                amount,
+                operationType,
+                task.getDescription(),
+                System.currentTimeMillis()
+        );
         account
                 .getAuditLog()
-                .add(new AccountLogRecord(
-                        amount,
-                        operationType,
-                        task.getDescription(),
-                        System.currentTimeMillis()
-                ));
+                .add(accountLogRecord);
 
-        accountRepository.save(account);
+        return accountLogRecord;
     }
 
     private Profile findProfile(UUID profilePublicId) {

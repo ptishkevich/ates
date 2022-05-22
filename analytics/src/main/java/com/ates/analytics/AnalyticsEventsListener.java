@@ -54,6 +54,7 @@ public class AnalyticsEventsListener {
         operation.setTaskId(task.getId());
         operation.setAmount(paymentMsg.getAmount());
         operation.setAccountOwnerPublicId(paymentMsg.getAccountOwnerPublicId());
+        operation.setPerformedAt(paymentMsg.getPerformedAt());
         taskBillingOperationRepository.save(operation);
     }
 
@@ -72,6 +73,7 @@ public class AnalyticsEventsListener {
         operation.setTaskId(task.getId());
         operation.setAmount(assignmentMsg.getAmount());
         operation.setAccountOwnerPublicId(assignmentMsg.getAccountOwnerPublicId());
+        operation.setPerformedAt(assignmentMsg.getPerformedAt());
         taskBillingOperationRepository.save(operation);
     }
 

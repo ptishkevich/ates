@@ -1,5 +1,7 @@
 package com.ates.analytics.task;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +16,8 @@ public class TaskBillingOperation {
     private int amount;
     private OperationType operationType;
     private String accountOwnerPublicId;
+    @ColumnDefault(value = "0")
+    private long performedAt;
 
     public enum OperationType {PAYMENT, FEE}
 
@@ -55,5 +59,13 @@ public class TaskBillingOperation {
 
     public void setAccountOwnerPublicId(String accountOwnerPublicId) {
         this.accountOwnerPublicId = accountOwnerPublicId;
+    }
+
+    public long getPerformedAt() {
+        return performedAt;
+    }
+
+    public void setPerformedAt(long performedAt) {
+        this.performedAt = performedAt;
     }
 }
