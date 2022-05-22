@@ -23,6 +23,9 @@ public class AppMvcController {
                 .getTopPricedTaskForToday()
                 .ifPresent(task -> model.addAttribute("topTask", task.getDescription()));
 
+        long numberWithNegativeBalance = analyticsLogic.numberOfEmployeesWithNegativeBalanceForToday();
+        model.addAttribute("negativeBalancesNum", numberWithNegativeBalance);
+
         return "stats";
     }
 }

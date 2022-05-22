@@ -159,6 +159,8 @@ public class BillingLogic {
                 .getAuditLog()
                 .add(accountLogRecord);
 
+        accountRepository.save(account);
+
         return accountLogRecord;
     }
 
