@@ -1,0 +1,25 @@
+syntax = "proto3";
+package account;
+import "event.proto";
+option java_package = "com.ates.messages";
+
+message TaskCompletionPaymentApplied {
+    EventHeaders headers = 1;
+    string taskPublicId = 2;
+    string accountOwnerPublicId = 3;
+    int32 amount = 4;
+}
+
+message TaskAssignmentFeeApplied {
+    EventHeaders headers = 1;
+    string taskPublicId = 2;
+    string accountOwnerPublicId = 3;
+    int32 amount = 4;
+}
+
+message TaskRatesCalculated {
+    EventHeaders headers = 1;
+    string taskPublicId = 2;
+    int32 completionPaymentAmount = 3;
+    int32 assignmentFeeAmount = 4;
+}

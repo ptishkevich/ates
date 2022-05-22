@@ -1,5 +1,6 @@
 package com.ates.billing.account;
 
+import com.ates.billing.BillingEventSender;
 import com.ates.billing.FakeEmailService;
 import com.ates.billing.profile.Profile;
 import com.ates.billing.profile.ProfileRepository;
@@ -15,7 +16,6 @@ import java.util.stream.StreamSupport;
 
 @Component
 public class BillingLogic {
-
     @Autowired
     AccountRepository accountRepository;
     @Autowired
@@ -26,25 +26,36 @@ public class BillingLogic {
     BillingCycleRepository billingCycleRepository;
     @Autowired
     TaskRepository taskRepository;
+    @Autowired
+    AccountEventSender accountEventSender;
+    @Autowired
+    BillingEventSender billingEventSender;
 
     private final Random random = new Random();
 
     public void applyFeeForTaskAssignment(UUID assigneePublicId, UUID taskPublicId) {
         createAuditLogRecord(assigneePublicId, taskPublicId, AccountLogRecord.OperationType.DEBIT);
+        int feeAmount = findTask(taskPublicId).getDebitAmount();
+        accountEventSender.sendTaskFeeAppliedEvent(assigneePublicId.toString(), taskPublicId.toString(), feeAmount);
     }
 
     public void applyPaymentForTaskCompletion(UUID completedByPublicId, UUID taskPublicId) {
         createAuditLogRecord(completedByPublicId, taskPublicId, AccountLogRecord.OperationType.CREDIT);
+        int paymentAmount = findTask(taskPublicId).getCreditAmount();
+        accountEventSender.sendTaskPaymentAppliedEvent(completedByPublicId.toString(), taskPublicId.toString(), paymentAmount);
     }
 
     public void calculateTaskPrices(UUID taskPublicId, String description) {
         com.ates.billing.task.Task task = new com.ates.billing.task.Task();
         task.setPublicId(taskPublicId);
         task.setDescription(description);
-        task.setCreditAmount(random.nextInt(21) + 20);
-        task.setDebitAmount(random.nextInt(11) + 10);
+        int creditAmount = random.nextInt(21) + 20;
+        int debitAmount = random.nextInt(11) + 10;
+        task.setCreditAmount(creditAmount);
+        task.setDebitAmount(debitAmount);
 
         taskRepository.save(task);
+        billingEventSender.sendTaskPriceCalculatedEvent(taskPublicId.toString(), creditAmount);
     }
 
     public void closeBillingCycle() {
@@ -73,7 +84,6 @@ public class BillingLogic {
         billingCycleRepository.save(currentBillingCycle);
         BillingCycle nextBillingCycle = new BillingCycle(currentBillingCycle.getEndTimestamp()+1, -1, BillingCycle.Status.OPEN);
         billingCycleRepository.save(nextBillingCycle);
-
     }
 
     private void performPayout(Account account, long cycleBegin, long cycleEnd) {
@@ -149,7 +159,7 @@ public class BillingLogic {
                 .findFirst();
 
         if (profileOptional.isEmpty()) {
-            throw new RuntimeException("Profile " + profilePublicId + " not found during assignment fee calculation");
+            throw new RuntimeException("Profile " + profilePublicId + " not found");
         }
 
         return profileOptional.get();
@@ -162,7 +172,7 @@ public class BillingLogic {
                 .findFirst();
 
         if (taskOptional.isEmpty()) {
-            throw new RuntimeException("Task " + taskPublicId + " not found during assignment fee calculation");
+            throw new RuntimeException("Task " + taskPublicId + " not found");
         }
         return taskOptional.get();
     }
