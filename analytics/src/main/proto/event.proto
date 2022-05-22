@@ -1,0 +1,12 @@
+syntax = "proto3";
+//package event;
+option java_package = "com.ates.messages";
+option java_multiple_files = true;
+
+message EventHeaders {
+    int32 version = 1;
+    string id = 2;
+    int64 time = 3;
+    string producer = 4;
+    string messageType = 5;
+}

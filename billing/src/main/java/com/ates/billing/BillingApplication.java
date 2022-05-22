@@ -59,6 +59,7 @@ public class BillingApplication {
 		Profile profile = new Profile();
 		profile.setPublicId(profileId);
 		profile.setName(profileCreatedMsg.getName());
+		profile.setEmail(profileCreatedMsg.getEmail());
 
 		profileRepository.save(profile);
 	}

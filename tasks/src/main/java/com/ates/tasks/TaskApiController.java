@@ -59,6 +59,9 @@ public class TaskApiController {
 
         if (task.getStatus() != null && dbTask.getStatus() != task.getStatus()) {
             dbTask.setStatus(task.getStatus());
+            if (task.getStatus() == Task.TaskStatus.COMPLETED) {
+                dbTask.setCompletedAt(System.currentTimeMillis());
+            }
             Task updatedTask = taskRepository.save(dbTask);
             if (Task.TaskStatus.COMPLETED == updatedTask.getStatus()) {
                 taskEventSender.sendTaskCompletedEvent(updatedTask);

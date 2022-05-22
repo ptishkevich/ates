@@ -1,4 +1,4 @@
-package com.ates.tasks;
+package com.ates.analytics.task;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -6,32 +6,24 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.UUID;
 
 @Entity
 public class Task {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-    private UUID assigneeId;
+    private int id;
     private String description;
-    private TaskStatus status;
+    private String publicTaskId;
+    private int price;
     @ColumnDefault(value = "0")
     private long completedAt;
 
-    protected Task() {}
-
-    enum TaskStatus{
-        OPEN, COMPLETED
+    public int getId() {
+        return id;
     }
 
-    public UUID getAssigneeId() {
-        return assigneeId;
-    }
-
-    public void setAssigneeId(UUID assigneeId) {
-        this.assigneeId = assigneeId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -42,16 +34,20 @@ public class Task {
         this.description = description;
     }
 
-    public TaskStatus getStatus() {
-        return status;
+    public String getPublicTaskId() {
+        return publicTaskId;
     }
 
-    public void setStatus(TaskStatus status) {
-        this.status = status;
+    public void setPublicTaskId(String publicTaskId) {
+        this.publicTaskId = publicTaskId;
     }
 
-    public UUID getId() {
-        return id;
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public long getCompletedAt() {
