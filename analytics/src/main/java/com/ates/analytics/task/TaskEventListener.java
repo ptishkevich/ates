@@ -23,12 +23,18 @@ public class TaskEventListener {
         DynamicMessage message = data.value();
         String messageType = message.getDescriptorForType().getFullName();
 
-        if(messageType.equals("task.Added")) {
-            handleTaskAdded(message);
+        switch (messageType) {
+            case "task.Added":
+                handleTaskAdded(message);
+                break;
+            case "task.PriceCalculated":
+                handleTaskPriceCalculated(message);
+                break;
+            case "task.Completed":
+                handleTaskCompleted(message);
+                break;
         }
-        else if (messageType.equals("task.PriceCalculated")) {
-            handleTaskPriceCalculated(message);
-        }
+
     }
 
     private void handleTaskAdded(DynamicMessage message) throws InvalidProtocolBufferException {
@@ -81,7 +87,28 @@ public class TaskEventListener {
             }
         }
         else {
-            throw new RuntimeException("Unsupported version " + eventVersion + " of Billing.TaskPriceCalculated event");
+            throw new RuntimeException("Unsupported version " + eventVersion + " Task.PriceCalculated event");
+        }
+    }
+
+    private void handleTaskCompleted(DynamicMessage message) throws InvalidProtocolBufferException {
+        com.ates.messages.Task.Completed completedMsg = com.ates.messages.Task.Completed
+                .newBuilder()
+                .build()
+                .getParserForType()
+                .parseFrom(message.toByteArray());
+
+        int eventVersion = completedMsg.getHeaders().getVersion();
+        if (1 == eventVersion) {
+            List<Task> existingTasks = taskRepository.findByPublicTaskId(completedMsg.getPublicId());
+            if(!existingTasks.isEmpty()) {
+                Task task = existingTasks.get(0);
+                task.setCompletedAt(completedMsg.getCompletedAt());
+                taskRepository.save(task);
+            }
+        }
+        else {
+            throw new RuntimeException("Unsupported version " + eventVersion + " of Task.Completed event");
         }
     }
 }

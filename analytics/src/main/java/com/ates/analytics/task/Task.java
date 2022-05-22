@@ -1,5 +1,7 @@
 package com.ates.analytics.task;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +15,8 @@ public class Task {
     private String description;
     private String publicTaskId;
     private int price;
+    @ColumnDefault(value = "0")
+    private long completedAt;
 
     public int getId() {
         return id;
@@ -44,5 +48,13 @@ public class Task {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public long getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(long completedAt) {
+        this.completedAt = completedAt;
     }
 }

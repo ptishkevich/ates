@@ -19,4 +19,11 @@ message Completed {
     string publicId = 1;
     string completedById = 2;
     EventHeaders headers = 3;
+    int64 completedAt = 4;
+}
+
+message PriceCalculated {
+    EventHeaders headers = 1;
+    string taskPublicId = 2;
+    int32 amount = 3;
 }

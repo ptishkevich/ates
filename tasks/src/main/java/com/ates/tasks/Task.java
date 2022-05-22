@@ -1,5 +1,7 @@
 package com.ates.tasks;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,8 @@ public class Task {
     private UUID assigneeId;
     private String description;
     private TaskStatus status;
+    @ColumnDefault(value = "0")
+    private long completedAt;
 
     protected Task() {}
 
@@ -48,5 +52,13 @@ public class Task {
 
     public UUID getId() {
         return id;
+    }
+
+    public long getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(long completedAt) {
+        this.completedAt = completedAt;
     }
 }

@@ -74,6 +74,7 @@ public class TaskEventSender {
                 .setHeaders(eventHeaders)
                 .setPublicId(publicId)
                 .setCompletedById(assigneeId)
+                .setCompletedAt(task.getCompletedAt())
                 .build();
         taskCompletedTemplate.send(TASK_LIFECYCLE_TOPIC_NAME, publicId, taskCompletedMsg);
     }

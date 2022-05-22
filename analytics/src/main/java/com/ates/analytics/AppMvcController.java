@@ -19,6 +19,10 @@ public class AppMvcController {
         int revenueForToday = analyticsLogic.calculateRevenueForToday();
         model.addAttribute("revenue", revenueForToday);
 
+        analyticsLogic
+                .getTopPricedTaskForToday()
+                .ifPresent(task -> model.addAttribute("topTask", task.getDescription()));
+
         return "stats";
     }
 }
